@@ -10,8 +10,8 @@ function LoginForm() {
     setError('');
 
     try {
-      // 1. Verifica se o usuário existe
-      const resUser = await fetch('/api/verificar-usuario', {
+      // 1. Verifica se o usuário existe 
+      const resUser = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username })
@@ -24,7 +24,7 @@ function LoginForm() {
       }
 
       // 2. Efetua login
-      const resLogin = await fetch('/api/login', {
+      const resLogin = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })

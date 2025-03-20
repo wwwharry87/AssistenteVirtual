@@ -20,7 +20,8 @@ function CoordInformaPage() {
 
   // Carrega os municípios com dados do tipo 1
   useEffect(() => {
-    fetch('/api/municipios')
+    fetch`${process.env.REACT_APP_API_URL}/api/municipios`
+
       .then(res => res.json())
       .then(data => {
         const filtered = data.filter(item =>
@@ -38,7 +39,7 @@ function CoordInformaPage() {
   useEffect(() => {
     if (selectedMunicipio) {
       setLoading(true);
-      fetch(`/api/dados-csv?municipio=${encodeURIComponent(selectedMunicipio)}&tipo=1`)
+      fetch(`${process.env.REACT_APP_API_URL}/api/dados-csv?municipio=${encodeURIComponent(selectedMunicipio)}&tipo=1`)
         .then(res => {
           if (!res.ok) {
             throw new Error(`Erro ${res.status}: ${res.statusText}`);
@@ -126,7 +127,7 @@ function CoordInformaPage() {
       setSendProgress(prev => (prev < 90 ? prev + 5 : prev));
     }, 500);
 
-    fetch('/api/coordinforma/send-messages', {
+    fetch('${process.env.REACT_APP_API_URL}/api/coordinforma/send-messages', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
