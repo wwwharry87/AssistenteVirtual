@@ -1,0 +1,25 @@
+2025/03/20-14:38:31.100 8207 Reusing MANIFEST /Users/wesleymelo/AssistenteVirtual/backend/tokens/session-name/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/03/20-14:38:31.101 8207 Recovering log #1264
+2025/03/20-14:38:31.115 8207 Reusing old log /Users/wesleymelo/AssistenteVirtual/backend/tokens/session-name/Default/IndexedDB/https_web.whatsapp.com_0.indexeddb.leveldb/001264.log 
+2025/03/20-14:38:34.804 8207 Level-0 table #1275: started
+2025/03/20-14:38:34.818 8207 Level-0 table #1275: 636746 bytes OK
+2025/03/20-14:38:34.820 8207 Delete type=0 #1264
+2025/03/20-14:38:34.829 fa03 Manual compaction at level-0 from ' \x05\x01\x00\x00\x00' @ 72057594037927935 : 1 .. ' \x06\x01\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/03/20-14:38:35.450 a403 Compacting 1@1 + 7@2 files
+2025/03/20-14:38:35.498 a403 Generated table #1276@1: 73720 keys, 2237426 bytes
+2025/03/20-14:38:35.525 a403 Generated table #1277@1: 37178 keys, 2199219 bytes
+2025/03/20-14:38:35.539 a403 Generated table #1278@1: 10960 keys, 2145192 bytes
+2025/03/20-14:38:35.556 a403 Generated table #1279@1: 9825 keys, 2125997 bytes
+2025/03/20-14:38:35.590 a403 Generated table #1280@1: 99611 keys, 2251259 bytes
+2025/03/20-14:38:35.623 a403 Generated table #1281@1: 99779 keys, 2251193 bytes
+2025/03/20-14:38:35.640 a403 Generated table #1282@1: 47698 keys, 1077711 bytes
+2025/03/20-14:38:35.640 a403 Compacted 1@1 + 7@2 files => 14287997 bytes
+2025/03/20-14:38:35.641 a403 compacted to: files[ 0 0 7 0 0 0 0 ]
+2025/03/20-14:38:35.642 a403 Delete type=2 #1268
+2025/03/20-14:38:35.642 a403 Delete type=2 #1269
+2025/03/20-14:38:35.642 a403 Delete type=2 #1275
+2025/03/20-14:38:35.642 a403 Delete type=2 #1270
+2025/03/20-14:38:35.642 a403 Delete type=2 #1271
+2025/03/20-14:38:35.642 a403 Delete type=2 #1267
+2025/03/20-14:38:35.642 a403 Delete type=2 #1272
+2025/03/20-14:38:35.642 a403 Delete type=2 #1266
