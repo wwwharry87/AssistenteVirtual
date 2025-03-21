@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
+const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const app = express();
@@ -8,15 +9,23 @@ const app = express();
 // Configurações do servidor
 const { port, sessionSecret } = require('./config/serverConfig');
 
-// Middlewares
+// Configurar CORS para permitir requisições do seu frontend hospedado no Render
+app.use(cors({
+    origin: "https://assistentevirtual-7it5.onrender.com",  // ajuste para a URL do seu frontend
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization"
+}));
+
+// Middlewares para tratar JSON e formulários
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Configurar sessão (lembre-se de usar um store em produção)
 app.use(session({
-  secret: sessionSecret,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { maxAge: 600000 }
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 600000 }
 }));
 
 // Inicializa o Venom-Bot
@@ -34,7 +43,7 @@ app.use('/api/coordinforma', coordinformaRoutes);
 app.use('/api/respinforma', respinformaRoutes);
 app.use('/api/dados-csv', dadosCsvRoutes);
 
-// Rota para carregar municípios (sem alterações)
+// Rota para carregar municípios
 app.get('/api/municipios', (req, res) => {
   const filePath = path.join(__dirname, 'data', 'municipio.txt');
   if (!fs.existsSync(filePath)) {
@@ -65,7 +74,7 @@ app.get('/api/municipios', (req, res) => {
   }
 });
 
-// Endpoint para retornar o status do WhatsApp e a string do QR
+// Endpoint para retornar o status do WhatsApp e a string do QR (para reconexão, se necessário)
 app.get('/api/whatsapp-status', (req, res) => {
   const connected = whatsappService.isClientReady();
   const qrString = whatsappService.getLastQrRawData();
@@ -75,10 +84,9 @@ app.get('/api/whatsapp-status', (req, res) => {
   res.json({ connected, qrString });
 });
 
-// Servir arquivos estáticos (se necessário)
-app.use(express.static(path.join(__dirname, '../frontend/public')));
+// (Opcional) Serve arquivos estáticos do frontend (se desejar)
+// app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-// Middleware para tratamento global de erros
 const errorHandler = require('./middlewares/errorHandler');
 app.use(errorHandler);
 

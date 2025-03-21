@@ -8,29 +8,29 @@ function LoginForm() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
-
+  
     try {
-      // 1. Verifica se o usuário existe 
-      const resUser = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
+      // Verifica se o usuário existe
+      const resUser = await fetch(`${process.env.REACT_APP_API_URL}/api/verificar-usuario`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username })
       });
       const dataUser = await resUser.json();
-
+  
       if (!dataUser.success) {
         setError(dataUser.message || 'Usuário não encontrado.');
         return;
       }
-
-      // 2. Efetua login
+  
+      // Efetua login
       const resLogin = await fetch(`${process.env.REACT_APP_API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
       const dataLogin = await resLogin.json();
-
+  
       if (dataLogin.success) {
         window.location.href = dataLogin.redirecionar;
       } else {
@@ -40,7 +40,7 @@ function LoginForm() {
       console.error(err);
       setError('Erro ao fazer login.');
     }
-  };
+  };  
 
   return (
     <form onSubmit={handleLogin}>
