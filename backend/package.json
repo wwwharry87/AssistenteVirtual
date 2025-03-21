@@ -17,7 +17,8 @@
     "moment": "^2.29.4",
     "pdfmake": "^0.2.7",
     "qrcode": "^1.5.1",
-    "venom-bot": "^4.2.1"
+    "venom-bot": "^4.2.1",
+    "puppeteer": "19.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
