@@ -12,20 +12,19 @@ exports.sendMessages = async (req, res, next) => {
     return res.status(500).json({ error: 'WhatsApp não está conectado ou indisponível.' });
   }
 
-  // Apenas verifica se o cliente foi obtido
   if (!client) {
     console.error('Cliente do WhatsApp não está conectado ou indisponível.');
     return res.status(500).json({ error: 'WhatsApp não está conectado ou indisponível.' });
   }
   console.log('Cliente do WhatsApp obtido.');
 
-  if (!dados || dados.length === 0) {
+  if (!dados || !Array.isArray(dados) || dados.length === 0) {
     return res.status(400).json({ error: 'Nenhum dado para envio.' });
   }
 
   const resultados = [];
   try {
-    // Agrupa os dados por telefone
+    // Agrupa os dados por telefone com validação extra
     const responsaveis = {};
     dados.forEach((item) => {
       if (!item.telefone) {
@@ -33,6 +32,10 @@ exports.sendMessages = async (req, res, next) => {
         return;
       }
       let numero = item.telefone.replace(/\D/g, '');
+      if (numero.length < 10) {
+        console.error('Telefone com dígitos insuficientes:', item.telefone);
+        return;
+      }
       if (numero.length === 11) {
         numero = numero.replace(/^(\d{2})9/, '$1');
       }
@@ -48,6 +51,7 @@ exports.sendMessages = async (req, res, next) => {
     });
 
     const telefones = Object.keys(responsaveis);
+    console.log(`Total de responsáveis agrupados: ${telefones.length}`);
     for (let i = 0; i < telefones.length; i += 10) {
       const lote = telefones.slice(i, i + 10);
       for (const telefone of lote) {
@@ -70,13 +74,11 @@ exports.sendMessages = async (req, res, next) => {
 
         try {
           console.log(`Enviando mensagem para: ${telefone}`);
-          // Usa sendText (método atual do venom-bot)
           await client.sendText(telefone, mensagem);
           resultados.push({ telefone, status: 'enviado' });
         } catch (sendError) {
-          console.error(`Erro ao enviar mensagem para ${telefone}:`, sendError.message);
-          // Se o erro indicar que a sessão foi encerrada, aborta o envio e notifica o front
-          if (sendError.message.includes("Session closed")) {
+          console.error(`Erro ao enviar mensagem para ${telefone}:`, sendError);
+          if (sendError.message && sendError.message.includes("Session closed")) {
             return res.status(500).json({ error: "Sessão do WhatsApp foi encerrada. Por favor, reconecte." });
           }
           resultados.push({ telefone, status: 'falha', motivo: sendError.message });
@@ -93,7 +95,7 @@ exports.sendMessages = async (req, res, next) => {
       resultados
     });
   } catch (error) {
-    console.error('Erro ao enviar mensagens:', error.message);
+    console.error('Erro ao enviar mensagens:', error);
     next(error);
   }
 };
