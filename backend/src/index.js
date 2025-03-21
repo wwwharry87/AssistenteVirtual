@@ -1,5 +1,6 @@
 // index.js
 require('dotenv').config();
+require('events').EventEmitter.defaultMaxListeners = 20; // Aumenta o limite de listeners
 const express = require('express');
 const session = require('express-session');
 const cors = require('cors');
@@ -31,6 +32,7 @@ app.use(session({
 
 // Inicializa o Venom-Bot
 const whatsappService = require('./services/whatsappService');
+// Caso a inicialização falhe, o erro já será logado
 whatsappService.initializeClient().catch(err => console.error(err));
 
 // Importa as rotas
@@ -86,13 +88,20 @@ app.get('/api/whatsapp-status', async (req, res) => {
 
   // Se não estiver conectado e não houver QR, tenta reinicializar o cliente
   if (!connected && !qrString) {
-    try {
-      console.log('Tentando reinicializar o cliente do WhatsApp para obter QR...');
-      await whatsappService.initializeClient();
+    if (!whatsappService.isInitializing) {
+      try {
+        console.log('Tentando reinicializar o cliente do WhatsApp para obter QR...');
+        whatsappService.isInitializing = true;
+        await whatsappService.initializeClient();
+      } catch (error) {
+        console.error('Erro ao reinicializar o WhatsApp:', error);
+      } finally {
+        whatsappService.isInitializing = false;
+      }
       connected = whatsappService.isClientReady();
       qrString = whatsappService.getLastQrRawData();
-    } catch (error) {
-      console.error('Erro ao reinicializar o WhatsApp:', error);
+    } else {
+      console.log('Cliente já está em processo de inicialização.');
     }
   }
 
