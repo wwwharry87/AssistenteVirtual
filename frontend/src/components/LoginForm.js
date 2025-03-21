@@ -1,10 +1,12 @@
 // LoginForm.js
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -33,7 +35,8 @@ function LoginForm() {
       const dataLogin = await resLogin.json();
   
       if (dataLogin.success) {
-        window.location.href = dataLogin.redirecionar;
+        // Use a navegação interna em vez de window.location.href:
+        navigate(dataLogin.redirecionar);
       } else {
         setError(dataLogin.message || 'Senha inválida.');
       }
@@ -41,7 +44,7 @@ function LoginForm() {
       console.error(err);
       setError('Erro ao fazer login.');
     }
-  };  
+  };
 
   return (
     <form onSubmit={handleLogin}>
