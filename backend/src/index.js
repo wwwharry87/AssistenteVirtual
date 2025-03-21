@@ -1,3 +1,4 @@
+// index.js
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
@@ -75,12 +76,28 @@ app.get('/api/municipios', (req, res) => {
 });
 
 // Endpoint para retornar o status do WhatsApp e a string do QR (para reconexão, se necessário)
-app.get('/api/whatsapp-status', (req, res) => {
-  const connected = whatsappService.isClientReady();
-  const qrString = whatsappService.getLastQrRawData();
+app.get('/api/whatsapp-status', async (req, res) => {
+  let connected = whatsappService.isClientReady();
+  let qrString = whatsappService.getLastQrRawData();
+
   console.log('===== [API] /api/whatsapp-status =====');
-  console.log('connected:', connected);
-  console.log('qrString:', qrString);
+  console.log('Inicial - connected:', connected);
+  console.log('Inicial - qrString:', qrString);
+
+  // Se não estiver conectado e não houver QR, tenta reinicializar o cliente
+  if (!connected && !qrString) {
+    try {
+      console.log('Tentando reinicializar o cliente do WhatsApp para obter QR...');
+      await whatsappService.initializeClient();
+      connected = whatsappService.isClientReady();
+      qrString = whatsappService.getLastQrRawData();
+    } catch (error) {
+      console.error('Erro ao reinicializar o WhatsApp:', error);
+    }
+  }
+
+  console.log('Final - connected:', connected);
+  console.log('Final - qrString:', qrString);
   res.json({ connected, qrString });
 });
 
