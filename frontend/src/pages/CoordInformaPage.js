@@ -20,8 +20,7 @@ function CoordInformaPage() {
 
   // Carrega os municípios com dados do tipo 1
   useEffect(() => {
-    fetch`${process.env.REACT_APP_API_URL}/api/municipios`
-
+    fetch(`${process.env.REACT_APP_API_URL}/api/municipios`)
       .then(res => res.json())
       .then(data => {
         const filtered = data.filter(item =>
@@ -127,7 +126,7 @@ function CoordInformaPage() {
       setSendProgress(prev => (prev < 90 ? prev + 5 : prev));
     }, 500);
 
-    fetch('${process.env.REACT_APP_API_URL}/api/coordinforma/send-messages', {
+    fetch(`${process.env.REACT_APP_API_URL}/api/coordinforma/send-messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -171,11 +170,7 @@ function CoordInformaPage() {
       {/* Cabeçalho */}
       <header className="bg-white shadow-lg rounded-2xl p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-4 flex-1">
-          <img 
-            src="/logo_c.png" 
-            alt="Logo CoordInforma" 
-            className="h-16 w-16 object-contain p-2 bg-gray-100 rounded-xl" 
-          />
+          <img src="/logo_c.png" alt="Logo CoordInforma" className="h-16 w-16 object-contain p-2 bg-gray-100 rounded-xl" />
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-green-600">CoordInforma</h1>
             <p className="text-gray-500 text-sm md:text-base">Dashboard de Coordenação</p>
@@ -258,7 +253,7 @@ function CoordInformaPage() {
               <div 
                 className="bg-green-600 h-2 rounded transition-all duration-200" 
                 style={{ width: `${sendProgress}%` }}
-              />
+              ></div>
             </div>
           </div>
         )}
@@ -278,7 +273,6 @@ function CoordInformaPage() {
         ) : error ? (
           <div className="text-center text-red-500 py-6">{error}</div>
         ) : (
-          // A tabela usa classes para fonte bem reduzida e evita scroll horizontal
           <div>
             <table className="table-fixed w-full text-[10px] whitespace-normal break-words">
               <thead className="bg-gray-50">

@@ -27,7 +27,7 @@ function RespInformaPage() {
   // Busca o status do WhatsApp e o QR Code (caso necessário)
   useEffect(() => {
     const fetchWhatsappStatus = () => {
-      fetch('/api/whatsapp-status')
+      fetch(`${process.env.REACT_APP_API_URL}/api/whatsapp-status`)
         .then(res => res.json())
         .then(data => {
           console.log('[FRONTEND] /api/whatsapp-status =>', data);
@@ -48,7 +48,7 @@ function RespInformaPage() {
 
   // Carrega os municípios que possuem dados do tipo 2 (responsável)
   useEffect(() => {
-    fetch('/api/municipios')
+    fetch(`${process.env.REACT_APP_API_URL}/api/municipios`)
       .then(res => res.json())
       .then(data => {
         const filtered = data.filter(item =>
@@ -66,7 +66,7 @@ function RespInformaPage() {
   useEffect(() => {
     if (selectedMunicipio) {
       setLoading(true);
-      fetch(`/api/dados-csv?municipio=${encodeURIComponent(selectedMunicipio)}&tipo=2`)
+      fetch(`${process.env.REACT_APP_API_URL}/api/dados-csv?municipio=${encodeURIComponent(selectedMunicipio)}&tipo=2`)
         .then(res => {
           if (!res.ok) {
             throw new Error(`Erro ${res.status}: ${res.statusText}`);
@@ -152,7 +152,7 @@ function RespInformaPage() {
       setSendProgress(prev => (prev < 90 ? prev + 5 : prev));
     }, 500);
 
-    fetch('/api/respinforma/send-messages', {
+    fetch(`${process.env.REACT_APP_API_URL}/api/respinforma/send-messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -306,7 +306,6 @@ function RespInformaPage() {
         ) : error ? (
           <div className="text-center text-red-500 py-6">{error}</div>
         ) : (
-          // A tabela usa classes para fonte reduzida e ocupa 100% da tela sem scroll horizontal
           <div>
             <table className="w-full text-xs">
               <thead className="bg-gray-50">
