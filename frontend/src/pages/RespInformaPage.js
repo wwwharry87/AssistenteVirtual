@@ -1,7 +1,10 @@
+// RespInformaPage.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import QRCode from 'react-qr-code';
 
 function RespInformaPage() {
+  const navigate = useNavigate();
   const [municipios, setMunicipios] = useState([]);
   const [selectedMunicipio, setSelectedMunicipio] = useState('');
   const [dataCSV, setDataCSV] = useState([]);
@@ -203,7 +206,7 @@ function RespInformaPage() {
           </div>
         </div>
         <div className="flex gap-4">
-          <button onClick={() => window.location.href = '/coordinforma'} className="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors">
+          <button onClick={() => navigate('/coordinforma')} className="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors">
             <i className="fas fa-exchange-alt text-xl"></i>
           </button>
           <button onClick={() => window.location.href = '/logout'} className="p-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-colors">

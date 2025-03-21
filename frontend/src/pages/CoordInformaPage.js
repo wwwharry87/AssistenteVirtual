@@ -1,6 +1,9 @@
+// CoordInformaPage.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function CoordInformaPage() {
+  const navigate = useNavigate();
   const [municipios, setMunicipios] = useState([]);
   const [selectedMunicipio, setSelectedMunicipio] = useState('');
   const [dataCSV, setDataCSV] = useState([]);
@@ -178,7 +181,7 @@ function CoordInformaPage() {
         </div>
         <div className="flex gap-4">
           <button 
-            onClick={() => window.location.href = '/respinforma'} 
+            onClick={() => navigate('/respinforma')} 
             className="p-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
           >
             <i className="fas fa-exchange-alt text-xl"></i>

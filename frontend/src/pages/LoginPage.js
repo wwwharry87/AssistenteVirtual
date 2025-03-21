@@ -1,7 +1,10 @@
+// LoginPage.js
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 
 function LoginPage() {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-green-200 to-green-400 font-sans">
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-sm w-full">
@@ -14,7 +17,7 @@ function LoginPage() {
         <div className="mt-4 text-center">
           <span
             className="text-blue-600 cursor-pointer underline"
-            onClick={() => window.location.href = '/redefinir'}
+            onClick={() => navigate('/redefinir')}
           >
             Esqueceu a senha?
           </span>
