@@ -1,8 +1,9 @@
+// whatsappService.js
 const venom = require('venom-bot');
 
 let client;
 let clientReady = false;
-let lastQrRawData = null; // Em vez de armazenar a imagem base64, guardamos o texto do QR
+let lastQrRawData = null; // Armazena o texto do QR
 
 const initializeClient = async () => {
   try {
@@ -11,18 +12,20 @@ const initializeClient = async () => {
       catchQR: (base64Qrimg, asciiQR, attempts, urlCode) => {
         console.log('===== [VENOM-BOT] ASCII QR =====');
         console.log(asciiQR);
-
         console.log('===== [VENOM-BOT] urlCode (string crua) =====');
         console.log(urlCode);
-
-        // Armazena a string bruta do QR
+        // Armazena a string bruta do QR para que o frontend possa exibir o QRCode
         lastQrRawData = urlCode;
       },
       headless: true,
       devtools: false,
       useChrome: true,
       logQR: true,
-      autoClose: 0, // Não fecha automaticamente, assim fica esperando até escanear
+      autoClose: 0, // Não fecha automaticamente
+      // Opções do Puppeteer para ambientes headless (como Render)
+      puppeteerOptions: {
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+      }
     });
     clientReady = true;
     console.log('Venom-Bot inicializado com sucesso!');
@@ -42,7 +45,7 @@ const getClient = () => {
 
 const isClientReady = () => clientReady;
 
-// Função para pegar a string crua do QR (urlCode)
+// Retorna a string crua do QR (urlCode)
 const getLastQrRawData = () => lastQrRawData;
 
 module.exports = {
