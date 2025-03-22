@@ -1,4 +1,3 @@
-// respinformaController.js
 const whatsappService = require('../services/whatsappService');
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 

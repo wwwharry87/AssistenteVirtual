@@ -1,4 +1,3 @@
-// index.js
 require('dotenv').config();
 require('events').EventEmitter.defaultMaxListeners = 20; // Aumenta o limite de listeners
 const express = require('express');
@@ -105,5 +104,8 @@ app.get('/api/whatsapp-status', async (req, res) => {
   console.log('Final - qrString:', qrString);
   res.json({ connected, qrString });
 });
-// (Opcional) Serve arquivos estáticos do frontend (se desejar)
-// app.use(express.static(path.join(__dirname,
+
+// Inicia o servidor
+app.listen(port, () => {
+  console.log(`Servidor rodando na porta ${port}`);
+});
