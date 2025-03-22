@@ -11,8 +11,15 @@ const app = express();
 const { port, sessionSecret } = require('./config/serverConfig');
 
 // Configurar CORS para permitir requisições do seu frontend hospedado no Render
+const allowedOrigins = ['https://assistentevirtual-7it5.onrender.com', 'http://localhost:3000'];
 app.use(cors({
-    origin: "https://assistentevirtual-7it5.onrender.com",  // ajuste para a URL do seu frontend
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: "GET,POST,PUT,DELETE",
     allowedHeaders: "Content-Type,Authorization"
 }));
@@ -26,7 +33,11 @@ app.use(session({
     secret: sessionSecret,
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 600000 }
+    cookie: { 
+        maxAge: 600000,
+        secure: process.env.NODE_ENV === 'production', // Apenas em produção com HTTPS
+        httpOnly: true
+    }
 }));
 
 // Inicializa o Venom-Bot
@@ -85,11 +96,15 @@ app.get('/api/whatsapp-status', async (req, res) => {
   console.log('Inicial - qrString:', qrString);
 
   // Se não estiver conectado e não houver QR, tenta reinicializar o cliente
-  if (!connected && !qrString) {
+  let retryCount = 0;
+  const maxRetries = 3;
+
+  if (!connected && !qrString && retryCount < maxRetries) {
     if (!whatsappService.isInitializing) {
       try {
         console.log('Tentando reinicializar o cliente do WhatsApp para obter QR...');
         await whatsappService.initializeClient();
+        retryCount++;
       } catch (error) {
         console.error('Erro ao reinicializar o WhatsApp:', error);
       }
@@ -103,6 +118,20 @@ app.get('/api/whatsapp-status', async (req, res) => {
   console.log('Final - connected:', connected);
   console.log('Final - qrString:', qrString);
   res.json({ connected, qrString });
+});
+
+// Middleware global para tratamento de erros
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Algo deu errado!' });
+});
+
+// Middleware para tratar payloads muito grandes
+app.use((err, req, res, next) => {
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Payload too large' });
+  }
+  next(err);
 });
 
 // Inicia o servidor

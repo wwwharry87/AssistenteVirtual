@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 let client = null;
-let qrCode = null;
+let qrCodeString = null; // Armazenará o QR code como string
 let isInitializing = false;
 const MAX_RETRIES = 3; // Número máximo de tentativas de reconexão
 let retryCount = 0;
@@ -36,7 +36,7 @@ const initializeClient = async () => {
         executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium-browser', // Usa o Chromium do Render
       },
       logQR: (qr) => {
-        qrCode = qr;
+        qrCodeString = qr; // Armazena o QR code como string
         console.log('QR Code gerado!');
       }
     });
@@ -65,7 +65,7 @@ const getClient = () => {
   return client;
 };
 
-const getQR = () => qrCode;
+const getQR = () => qrCodeString; // Retorna o QR code como string
 const isClientReady = () => !!client;
 
 module.exports = {
