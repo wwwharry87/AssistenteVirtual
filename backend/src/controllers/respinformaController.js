@@ -40,8 +40,8 @@ exports.sendMessages = async (req, res, next) => {
       if (numero.length === 11) {
         numero = numero.replace(/^(\d{2})9/, '$1');
       }
-      // Para Baileys, o sufixo deve ser '@s.whatsapp.net'
-      const telefone = numero ? `55${numero}@s.whatsapp.net` : null;
+      // Para Venom-Bot, o sufixo deve ser '@c.us'
+      const telefone = numero ? `55${numero}@c.us` : null;
       if (!telefone) {
         console.error(`Telefone inválido para o responsável: ${item.responsavel}`);
         return;
@@ -76,14 +76,10 @@ exports.sendMessages = async (req, res, next) => {
 
         try {
           console.log(`Enviando mensagem para: ${telefone}`);
-          // Com Baileys, utiliza-se sendMessage passando um objeto de mensagem
-          await client.sendMessage(telefone, { text: mensagem });
+          await client.sendText(telefone, mensagem);
           resultados.push({ telefone, status: 'enviado' });
         } catch (sendError) {
           console.error(`Erro ao enviar mensagem para ${telefone}:`, sendError);
-          if (sendError.message && sendError.message.includes("Session closed")) {
-            return res.status(500).json({ error: "Sessão do WhatsApp foi encerrada. Por favor, reconecte." });
-          }
           resultados.push({ telefone, status: 'falha', motivo: sendError.message });
         }
       }

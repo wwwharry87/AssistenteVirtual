@@ -32,7 +32,6 @@ app.use(session({
 
 // Inicializa o Venom-Bot
 const whatsappService = require('./services/whatsappService');
-// Caso a inicialização falhe, o erro já será logado
 whatsappService.initializeClient().catch(err => console.error(err));
 
 // Importa as rotas
@@ -80,7 +79,7 @@ app.get('/api/municipios', (req, res) => {
 // Endpoint para retornar o status do WhatsApp e a string do QR (para reconexão, se necessário)
 app.get('/api/whatsapp-status', async (req, res) => {
   let connected = whatsappService.isClientReady();
-  let qrString = whatsappService.getLastQrRawData();
+  let qrString = whatsappService.getQR();
 
   console.log('===== [API] /api/whatsapp-status =====');
   console.log('Inicial - connected:', connected);
@@ -91,15 +90,12 @@ app.get('/api/whatsapp-status', async (req, res) => {
     if (!whatsappService.isInitializing) {
       try {
         console.log('Tentando reinicializar o cliente do WhatsApp para obter QR...');
-        whatsappService.isInitializing = true;
         await whatsappService.initializeClient();
       } catch (error) {
         console.error('Erro ao reinicializar o WhatsApp:', error);
-      } finally {
-        whatsappService.isInitializing = false;
       }
       connected = whatsappService.isClientReady();
-      qrString = whatsappService.getLastQrRawData();
+      qrString = whatsappService.getQR();
     } else {
       console.log('Cliente já está em processo de inicialização.');
     }
@@ -111,11 +107,4 @@ app.get('/api/whatsapp-status', async (req, res) => {
 });
 
 // (Opcional) Serve arquivos estáticos do frontend (se desejar)
-// app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-const errorHandler = require('./middlewares/errorHandler');
-app.use(errorHandler);
-
-app.listen(port, () => {
-  console.log(`Servidor rodando na porta ${port}`);
-});
+// app.use(express.static(path.join(__dirname,
