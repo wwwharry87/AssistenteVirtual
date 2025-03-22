@@ -3,7 +3,8 @@ const venom = require('venom-bot');
 
 let client;
 let clientReady = false;
-let lastQrRawData = null; // Armazena o texto do QR
+let lastQrRawData = null;
+let isInitializing = false;
 
 const initializeClient = async () => {
   try {
@@ -14,7 +15,7 @@ const initializeClient = async () => {
         console.log(asciiQR);
         console.log('===== [VENOM-BOT] urlCode (string crua) =====');
         console.log(urlCode);
-        // Armazena a string bruta do QR para que o frontend possa exibir o QRCode
+        // Armazena a string do QR para o frontend exibir
         lastQrRawData = urlCode;
       },
       headless: true,
@@ -22,9 +23,13 @@ const initializeClient = async () => {
       useChrome: true,
       logQR: true,
       autoClose: 0, // Não fecha automaticamente
-      // Opções do Puppeteer para ambientes headless (como Render)
       puppeteerOptions: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage'
+        ]
       }
     });
     clientReady = true;
@@ -44,8 +49,6 @@ const getClient = () => {
 };
 
 const isClientReady = () => clientReady;
-
-// Retorna a string crua do QR (urlCode)
 const getLastQrRawData = () => lastQrRawData;
 
 module.exports = {
@@ -53,4 +56,10 @@ module.exports = {
   getClient,
   isClientReady,
   getLastQrRawData,
+  get isInitializing() {
+    return isInitializing;
+  },
+  set isInitializing(value) {
+    isInitializing = value;
+  }
 };
