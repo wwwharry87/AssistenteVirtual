@@ -1,5 +1,5 @@
 // whatsappService.js
-const venom = require('venom-bot');
+const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, DisconnectReason } = require('@adiwajshing/baileys');
 
 let client;
 let clientReady = false;
@@ -8,45 +8,50 @@ let isInitializing = false;
 
 const initializeClient = async () => {
   try {
-    console.log("Inicializando o Venom-Bot...");
-    client = await venom.create({
-      session: 'session-name',
-      catchQR: (base64Qrimg, asciiQR, attempts, urlCode) => {
-        console.log('===== [VENOM-BOT] ASCII QR =====');
-        console.log(asciiQR);
-        console.log('===== [VENOM-BOT] urlCode =====');
-        console.log(urlCode);
-        // Armazena a string do QR para que o frontend possa exibir o QRCode
-        lastQrRawData = urlCode;
-      },
-      headless: true,
-      devtools: false,
-      useChrome: true,
-      logQR: true,
-      autoClose: 0, // Não fecha automaticamente
-      puppeteerOptions: {
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage'
-        ],
-        // Tenta usar o caminho do Chromium no Render; ajuste se necessário.
-        executablePath: process.env.CHROME_BIN || '/usr/bin/chromium-browser'
+    console.log("Iniciando Baileys...");
+    // Cria o estado de autenticação em arquivos (na pasta 'baileys_auth')
+    const { state, saveCreds } = await useMultiFileAuthState('baileys_auth');
+    const { version, isLatest } = await fetchLatestBaileysVersion();
+    console.log(`Usando Baileys versão: ${version} (latest: ${isLatest})`);
+
+    client = makeWASocket({
+      version,
+      auth: state,
+      printQRInTerminal: true, // Opcional: imprime o QR no terminal para debug
+      logger: undefined, // ou defina seu logger, se desejar
+      // Outras opções podem ser adicionadas conforme necessário
+    });
+
+    // Ouve atualizações da conexão para capturar o QR e status
+    client.ev.on('connection.update', (update) => {
+      const { connection, lastDisconnect, qr } = update;
+      if (qr) {
+        console.log("QR recebido:", qr);
+        lastQrRawData = qr;
+      }
+      if (connection === 'open') {
+        console.log("Conexão aberta!");
+        clientReady = true;
+      } else if (connection === 'close') {
+        clientReady = false;
+        const reason = lastDisconnect?.error?.output?.statusCode;
+        console.log("Conexão fechada, motivo:", reason);
       }
     });
-    clientReady = true;
-    console.log('Venom-Bot inicializado com sucesso!');
+
+    // Atualiza as credenciais automaticamente
+    client.ev.on('creds.update', saveCreds);
+
     return client;
   } catch (error) {
-    console.error('Erro ao inicializar o Venom-Bot:', error);
+    console.error("Erro ao inicializar Baileys:", error);
     throw error;
   }
 };
 
 const getClient = () => {
   if (!client) {
-    throw new Error('Cliente Venom-Bot não inicializado.');
+    throw new Error("Cliente Baileys não inicializado.");
   }
   return client;
 };

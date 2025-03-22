@@ -1,3 +1,4 @@
+// respinformaController.js
 const whatsappService = require('../services/whatsappService');
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -39,7 +40,8 @@ exports.sendMessages = async (req, res, next) => {
       if (numero.length === 11) {
         numero = numero.replace(/^(\d{2})9/, '$1');
       }
-      const telefone = numero ? `55${numero}@c.us` : null;
+      // Para Baileys, use o sufixo '@s.whatsapp.net'
+      const telefone = numero ? `55${numero}@s.whatsapp.net` : null;
       if (!telefone) {
         console.error(`Telefone inválido para o responsável: ${item.responsavel}`);
         return;
@@ -74,7 +76,8 @@ exports.sendMessages = async (req, res, next) => {
 
         try {
           console.log(`Enviando mensagem para: ${telefone}`);
-          await client.sendText(telefone, mensagem);
+          // Com Baileys, utilize sendMessage
+          await client.sendMessage(telefone, { text: mensagem });
           resultados.push({ telefone, status: 'enviado' });
         } catch (sendError) {
           console.error(`Erro ao enviar mensagem para ${telefone}:`, sendError);
