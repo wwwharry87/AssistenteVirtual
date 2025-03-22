@@ -29,7 +29,9 @@ const initializeClient = async () => {
           '--disable-setuid-sandbox',
           '--disable-gpu',
           '--disable-dev-shm-usage'
-        ]
+        ],
+        // Define explicitamente o caminho do Chromium. Ajuste conforme necessário.
+        executablePath: process.env.CHROME_BIN || '/usr/bin/chromium-browser'
       }
     });
     clientReady = true;
