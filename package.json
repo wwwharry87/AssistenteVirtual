@@ -1,0 +1,14 @@
+{
+    "name": "assistentevirtual-dockerfile",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "dependencies": {
+      "express": "^4.17.1",
+      "venom-bot": "^4.0.5",
+      "dotenv": "^10.0.0",
+      "puppeteer": "^19.11.1"
+    }
+  }
