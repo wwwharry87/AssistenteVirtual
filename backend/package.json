@@ -20,7 +20,7 @@
     "moment": "^2.29.4",
     "pdfmake": "^0.2.7",
     "qrcode": "^1.5.1",
-    "@adiwajshing/baileys": "3.5.3"
+    "@adiwajshing/baileys": "4.4.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
