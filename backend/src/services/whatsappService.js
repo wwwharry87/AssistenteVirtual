@@ -25,16 +25,15 @@ const initializeClient = async () => {
       debug: true, // Habilita logs detalhados
       browserArgs: [
         '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--disable-gpu',
+        '--single-process'
       ],
       puppeteerOptions: {
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-accelerated-2d-canvas',
-          '--disable-gpu',
-          '--single-process'
-        ]
+        executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium-browser', // Usa o Chromium do Render
       },
       logQR: (qr) => {
         qrCode = qr;
