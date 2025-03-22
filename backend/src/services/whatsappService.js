@@ -1,5 +1,5 @@
 // whatsappService.js
-const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, DisconnectReason } = require('@adiwajshing/baileys');
+const { default: makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } = require('@adiwajshing/baileys');
 
 let client;
 let clientReady = false;
@@ -9,20 +9,19 @@ let isInitializing = false;
 const initializeClient = async () => {
   try {
     console.log("Iniciando Baileys...");
-    // Cria o estado de autenticação em arquivos (na pasta 'baileys_auth')
+    // Cria/recupera o estado de autenticação em arquivos (pasta 'baileys_auth')
     const { state, saveCreds } = await useMultiFileAuthState('baileys_auth');
     const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`Usando Baileys versão: ${version} (latest: ${isLatest})`);
-
+    console.log(`Usando Baileys versão: ${version} (mais recente: ${isLatest})`);
+    
     client = makeWASocket({
       version,
       auth: state,
-      printQRInTerminal: true, // Opcional: imprime o QR no terminal para debug
-      logger: undefined, // ou defina seu logger, se desejar
-      // Outras opções podem ser adicionadas conforme necessário
+      printQRInTerminal: true, // Imprime o QR no terminal para debug (opcional)
+      logger: undefined // Você pode configurar seu logger, se desejar
     });
-
-    // Ouve atualizações da conexão para capturar o QR e status
+    
+    // Ouve atualizações de conexão para capturar o QR e status
     client.ev.on('connection.update', (update) => {
       const { connection, lastDisconnect, qr } = update;
       if (qr) {
@@ -38,10 +37,10 @@ const initializeClient = async () => {
         console.log("Conexão fechada, motivo:", reason);
       }
     });
-
+    
     // Atualiza as credenciais automaticamente
     client.ev.on('creds.update', saveCreds);
-
+    
     return client;
   } catch (error) {
     console.error("Erro ao inicializar Baileys:", error);

@@ -40,7 +40,7 @@ exports.sendMessages = async (req, res, next) => {
       if (numero.length === 11) {
         numero = numero.replace(/^(\d{2})9/, '$1');
       }
-      // Para Baileys, use o sufixo '@s.whatsapp.net'
+      // Para Baileys, o sufixo deve ser '@s.whatsapp.net'
       const telefone = numero ? `55${numero}@s.whatsapp.net` : null;
       if (!telefone) {
         console.error(`Telefone inválido para o responsável: ${item.responsavel}`);
@@ -76,7 +76,7 @@ exports.sendMessages = async (req, res, next) => {
 
         try {
           console.log(`Enviando mensagem para: ${telefone}`);
-          // Com Baileys, utilize sendMessage
+          // Com Baileys, utiliza-se sendMessage passando um objeto de mensagem
           await client.sendMessage(telefone, { text: mensagem });
           resultados.push({ telefone, status: 'enviado' });
         } catch (sendError) {
