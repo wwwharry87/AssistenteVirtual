@@ -105,6 +105,5 @@ app.get('/api/whatsapp-status', async (req, res) => {
   console.log('Final - qrString:', qrString);
   res.json({ connected, qrString });
 });
-
 // (Opcional) Serve arquivos estáticos do frontend (se desejar)
 // app.use(express.static(path.join(__dirname,
