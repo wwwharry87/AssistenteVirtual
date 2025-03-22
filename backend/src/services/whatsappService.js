@@ -8,14 +8,15 @@ let isInitializing = false;
 
 const initializeClient = async () => {
   try {
+    console.log("Inicializando o Venom-Bot...");
     client = await venom.create({
       session: 'session-name',
       catchQR: (base64Qrimg, asciiQR, attempts, urlCode) => {
         console.log('===== [VENOM-BOT] ASCII QR =====');
         console.log(asciiQR);
-        console.log('===== [VENOM-BOT] urlCode (string crua) =====');
+        console.log('===== [VENOM-BOT] urlCode =====');
         console.log(urlCode);
-        // Armazena a string do QR para o frontend exibir
+        // Armazena a string do QR para que o frontend possa exibir o QRCode
         lastQrRawData = urlCode;
       },
       headless: true,
@@ -30,7 +31,7 @@ const initializeClient = async () => {
           '--disable-gpu',
           '--disable-dev-shm-usage'
         ],
-        // Define explicitamente o caminho do Chromium. Ajuste conforme necessário.
+        // Tenta usar o caminho do Chromium no Render; ajuste se necessário.
         executablePath: process.env.CHROME_BIN || '/usr/bin/chromium-browser'
       }
     });
