@@ -1,5 +1,7 @@
 // whatsappService.js
 const { makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } = require('@adiwajshing/baileys');
+const fs = require('fs');
+const path = require('path');
 
 let client;
 let clientReady = false;
@@ -9,49 +11,66 @@ let isInitializing = false;
 const initializeClient = async () => {
   try {
     console.log("Iniciando Baileys...");
-    // Cria/recupera o estado de autenticação em arquivos
-    const { state, saveCreds } = await useMultiFileAuthState('baileys_auth');
+
+    // Garante que o diretório de autenticação existe
+    const authDir = path.join(__dirname, 'baileys_auth');
+    if (!fs.existsSync(authDir)) {
+      fs.mkdirSync(authDir, { recursive: true });
+      console.log('Diretório baileys_auth criado com sucesso.');
+    }
+
+    // Carrega o estado de autenticação
+    const { state, saveCreds } = await useMultiFileAuthState(authDir);
     const { version, isLatest } = await fetchLatestBaileysVersion();
     console.log(`Usando Baileys versão: ${version} (mais recente: ${isLatest})`);
-    
+
+    // Configura o cliente do WhatsApp
     client = makeWASocket({
       version,
       auth: state,
       printQRInTerminal: true,
+      browser: ["Chrome", "Windows", "10.0.0"], // Necessário para ambientes serverless
       logger: undefined
     });
-    
-    // Ouve atualizações de conexão
+
+    // Evento de atualização de conexão
     client.ev.on('connection.update', (update) => {
       const { connection, lastDisconnect, qr } = update;
+      
       if (qr) {
         console.log("QR recebido:", qr);
         lastQrRawData = qr;
       }
+
       if (connection === 'open') {
         console.log("Conexão aberta!");
         clientReady = true;
       } else if (connection === 'close') {
         clientReady = false;
-        const reason = lastDisconnect?.error?.output?.statusCode;
-        console.log("Conexão fechada, motivo:", reason);
+        const reason = lastDisconnect?.error?.output?.statusCode || "Desconhecido";
+        console.log("Conexão fechada. Motivo:", reason);
+        
+        // Reconexão automática após 5 segundos
+        setTimeout(() => {
+          console.log("Tentando reconectar...");
+          initializeClient().catch(err => console.error("Erro na reconexão:", err));
+        }, 5000);
       }
     });
-    
-    // Atualiza as credenciais
+
+    // Atualiza credenciais
     client.ev.on('creds.update', saveCreds);
-    
+
     return client;
   } catch (error) {
-    console.error("Erro ao inicializar Baileys:", error);
+    console.error("Erro crítico ao inicializar Baileys:", error);
     throw error;
   }
 };
 
+// Métodos auxiliares
 const getClient = () => {
-  if (!client) {
-    throw new Error("Cliente Baileys não inicializado.");
-  }
+  if (!client) throw new Error("Cliente não inicializado.");
   return client;
 };
 
