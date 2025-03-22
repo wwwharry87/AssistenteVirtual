@@ -1,34 +1,34 @@
-const { makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion } = require('@adiwajshing/baileys');
+// whatsappService.js
+const baileys = require('@adiwajshing/baileys');
+// Tenta obter a função makeWASocket, seja como propriedade ou como default
+const makeWASocket = baileys.makeWASocket || baileys.default;
+const { useMultiFileAuthState, fetchLatestBaileysVersion } = baileys;
 const fs = require('fs');
 const path = require('path');
 
 let client;
 let clientReady = false;
 let lastQrRawData = null;
+let isInitializing = false;
 
 const initializeClient = async () => {
   try {
     console.log("Iniciando Baileys...");
     const authDir = path.join(__dirname, 'baileys_auth');
-    
-    // Garante que o diretório existe
     if (!fs.existsSync(authDir)) {
       fs.mkdirSync(authDir, { recursive: true });
     }
-
-    // Carrega o estado de autenticação
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
     const { version } = await fetchLatestBaileysVersion();
+    console.log(`Usando Baileys versão: ${version}`);
     
-    // Configura o cliente
     client = makeWASocket({
       version,
       auth: state,
       printQRInTerminal: true,
-      browser: ["Chrome", "Windows", "10.0.0"], // Chave para ambientes serverless
+      browser: ["Chrome", "Windows", "10.0.0"], // Fornece uma string para simular um ambiente de navegador
     });
-
-    // Eventos de conexão
+    
     client.ev.on('connection.update', (update) => {
       const { qr, connection } = update;
       if (qr) {
@@ -38,9 +38,12 @@ const initializeClient = async () => {
       if (connection === 'open') {
         clientReady = true;
         console.log("Conectado ao WhatsApp!");
+      } else if (connection === 'close') {
+        clientReady = false;
+        console.log("Conexão fechada.");
       }
     });
-
+    
     return client;
   } catch (error) {
     console.error("Erro crítico:", error);
@@ -48,4 +51,25 @@ const initializeClient = async () => {
   }
 };
 
-module.exports = { initializeClient, isClientReady: () => clientReady, getLastQrRawData: () => lastQrRawData };
+const getClient = () => {
+  if (!client) {
+    throw new Error("Cliente Baileys não inicializado.");
+  }
+  return client;
+};
+
+const isClientReady = () => clientReady;
+const getLastQrRawData = () => lastQrRawData;
+
+module.exports = {
+  initializeClient,
+  getClient,
+  isClientReady,
+  getLastQrRawData,
+  get isInitializing() {
+    return isInitializing;
+  },
+  set isInitializing(value) {
+    isInitializing = value;
+  }
+};
