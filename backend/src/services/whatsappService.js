@@ -12,7 +12,6 @@ const initializeClient = async () => {
   try {
     console.log("Iniciando Baileys...");
     const authDir = path.join(__dirname, 'baileys_auth');
-    // Garante que o diretório de autenticação existe
     if (!fs.existsSync(authDir)) {
       fs.mkdirSync(authDir, { recursive: true });
       console.log("Diretório de autenticação criado:", authDir);
@@ -20,20 +19,18 @@ const initializeClient = async () => {
       console.log("Diretório de autenticação encontrado:", authDir);
     }
 
-    // Carrega o estado de autenticação (armazenado em arquivos)
     const { state, saveCreds } = await useMultiFileAuthState(authDir);
     const { version } = await fetchLatestBaileysVersion();
     console.log(`Usando Baileys versão: ${version}`);
-
-    // Configura o cliente usando makeWASocket
+    
     client = makeWASocket({
       version,
       auth: state,
-      printQRInTerminal: true, // Imprime o QR no terminal para debug (opcional)
-      browser: ["Chrome", "Windows", "10.0.0"] // Simula um ambiente de navegador
+      printQRInTerminal: true,
+      // Tente ajustar essa configuração conforme necessário
+      browser: ["Chrome", "Windows", "10"],
     });
 
-    // Monitora atualizações na conexão
     client.ev.on('connection.update', (update) => {
       console.log("Atualização de conexão recebida:", update);
       const { qr, connection, lastDisconnect } = update;
@@ -54,7 +51,6 @@ const initializeClient = async () => {
       }
     });
 
-    // Atualiza as credenciais automaticamente
     client.ev.on('creds.update', saveCreds);
 
     return client;
