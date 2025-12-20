@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- CSP básica; permite chamadas à API no Render -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        connect-src 'self' https://assistentevirtual-8ern.onrender.com;
+        img-src 'self' data: blob:;
+        script-src 'self';
+        style-src 'self' 'unsafe-inline';
+        font-src 'self' data:;
+        frame-ancestors 'self';
+      "
+    >
+
+    <title>Assistente Virtual</title>
+
+    <!-- Define a URL base da API para o front -->
+    <script>
+      // ajuste aqui se seu backend mudar de URL
+      window.__API_BASE__ = 'https://assistentevirtual-8ern.onrender.com';
+      // dica: em desenvolvimento local, você pode comentar a linha acima e usar VITE_API_BASE
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- seu bundle (Vite/CRA) será injetado/servido aqui -->
+  </body>
+</html>
