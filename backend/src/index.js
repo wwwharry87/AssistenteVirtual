@@ -11,7 +11,7 @@ const app = express();
 // =============================
 // Configurações do servidor
 // =============================
-const { port, sessionSecret } = require('./config/serverConfig');
+const { port, sessionSecret, allowedOrigins, isProd } = require('./config/serverConfig');
 
 // Render/Proxy em HTTPS
 app.set('trust proxy', 1);
@@ -21,26 +21,32 @@ app.disable('x-powered-by');
 // =============================
 // CORS (front em Render + localhost)
 // =============================
-const FRONTENDS = [
-  'https://cr-virtual.onrender.com',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000'
-];
+const FRONTENDS = allowedOrigins;
+
+const corsOptions = {
+  origin: (origin, cb) => {
+    // permite chamadas sem origin (ex: healthchecks) e as de FRONTENDS
+    if (!origin || FRONTENDS.includes(origin)) return cb(null, true);
+    return cb(new Error(`Origin não permitido: ${origin}`));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key'],
+  credentials: true
+};
 
 app.use(
-  cors({
-    origin: (origin, cb) => {
-      // permite chamadas sem origin (ex: healthchecks) e as de FRONTENDS
-      if (!origin || FRONTENDS.includes(origin)) return cb(null, true);
-      return cb(new Error(`Origin não permitido: ${origin}`));
-    },
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  })
+  cors(corsOptions)
 );
 // preflight
-app.options('*', cors());
+app.options('*', cors(corsOptions));
+
+// =============================
+// CSV temporário (antes dos parsers globais)
+// =============================
+// O upload recebe o arquivo bruto, por isso esta rota precisa ser montada
+// antes de express.json/express.urlencoded. O GET /csv/* é público.
+const csvStorageRoutes = require('./routes/csvStorageRoutes');
+app.use(csvStorageRoutes);
 
 // =============================
 // Middlewares principais
@@ -56,8 +62,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 60 * 60 * 2, // 2h
-      sameSite: 'none', // necessário para cross-site em HTTPS
-      secure: true      // Render usa HTTPS
+      sameSite: isProd ? 'none' : 'lax',
+      secure: isProd
     }
   })
 );
